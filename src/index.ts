@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { intro, log, spinner } from "@clack/prompts";
+import { intro, log, outro, spinner } from "@clack/prompts";
 import { program } from "commander";
 import OpenAI from "openai";
 import fs from "fs";
@@ -13,6 +13,11 @@ program
   .option(
     "-l,--languages <languages>",
     "The language codes. Please check the language codes in XCode"
+  )
+  .option(
+    "-m, --model <model>",
+    "The model to use see list on openai https://platform.openai.com/docs/models",
+    "gpt-4o"
   )
   .option(
     "-a, --api-key <key>",
@@ -34,7 +39,49 @@ program
       return;
     }
 
+    async function translate({
+      text,
+      sourceLanguage,
+      targetLanguage,
+      openAi,
+      comment,
+    }: {
+      text: string;
+      sourceLanguage: string;
+      targetLanguage: string;
+      openAi: OpenAI;
+      comment?: string;
+    }): Promise<string> {
+      const result = await openAi.chat.completions.create({
+        model: options.model,
+        messages: [
+          {
+            role: "system",
+            content: `Translate from ${sourceLanguage} to ${targetLanguage}. You are translating an iOS string catalog. Please respect specific tokens and only return the translation.
+            ${
+              comment
+                ? `For this text the develeoper added a comment: ${comment}`
+                : ""
+            }`,
+          },
+          {
+            role: "user",
+            content: text,
+          },
+        ],
+      });
+
+      const message = result.choices?.[0]?.message.content;
+
+      if (!message) {
+        throw new Error("No translation found");
+      }
+
+      return message;
+    }
+
     intro("Let's go 🤞.");
+    let translationCount = 0;
 
     const fileContent = fs.readFileSync(
       file.replace("~", os.homedir()),
@@ -76,6 +123,7 @@ program
                   value: newText,
                 },
               };
+              translationCount++;
             } catch (e) {
               console.log(e);
             }
@@ -119,6 +167,7 @@ program
                   openAi: openai,
                   comment,
                 });
+                translationCount++;
 
                 catalog.strings[key].localizations[lang] = {
                   variations: {
@@ -157,6 +206,7 @@ program
                 openAi: openai,
                 comment,
               });
+              translationCount++;
 
               catalog.strings[key].localizations[lang] = {
                 stringUnit: {
@@ -170,73 +220,17 @@ program
           }
         }
       }
-
-      fs.writeFileSync(
-        file.replace("~", os.homedir()),
-        JSON.stringify(catalog, null, 2)
-      );
+      if (translationCount > 0) {
+        fs.writeFileSync(
+          file.replace("~", os.homedir()),
+          JSON.stringify(catalog, null, 2)
+        );
+        log.success(`Updated ${file}`);
+      }
+      outro(`Translated ${translationCount} strings`);
     } catch (e) {
       console.dir(e, { depth: null });
     }
   });
 
 program.parse(process.argv);
-
-export async function translate({
-  text,
-  sourceLanguage,
-  targetLanguage,
-  openAi,
-  comment,
-}: {
-  text: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  openAi: OpenAI;
-  comment?: string;
-}): Promise<string> {
-  console.log(`GPT`, {
-    model: "gpt-4o",
-    messages: [
-      {
-        role: "system",
-        content: `Translate from ${sourceLanguage} to ${targetLanguage}. You are translating an iOS string catalog. Please respect specific tokens and only return the translation.
-        ${
-          comment
-            ? `For this text the develeoper added a comment: ${comment}`
-            : ""
-        }`,
-      },
-      {
-        role: "user",
-        content: text,
-      },
-    ],
-  });
-  const result = await openAi.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      {
-        role: "system",
-        content: `Translate from ${sourceLanguage} to ${targetLanguage}. You are translating an iOS string catalog. Please respect specific tokens and only return the translation.
-        ${
-          comment
-            ? `For this text the develeoper added a comment: ${comment}`
-            : ""
-        }`,
-      },
-      {
-        role: "user",
-        content: text,
-      },
-    ],
-  });
-
-  const message = result.choices?.[0]?.message.content;
-
-  if (!message) {
-    throw new Error("No translation found");
-  }
-
-  return message;
-}
