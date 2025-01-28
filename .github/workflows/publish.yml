@@ -22,4 +22,4 @@ jobs:
       - name: Set version
         run: pnpm version $(echo "${{ github.event.release.tag_name }}" | sed "s/v//") --no-git-tag-version
       - name: Publish package on NPM 📦
-        run: pnpm publish
+        run: pnpm publish --no-git-checks
