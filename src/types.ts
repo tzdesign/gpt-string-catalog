@@ -39,10 +39,22 @@ export const stringCatalog = z.object({
       comment: z.string().optional(),
       extractionState: z
         .union([z.literal("manual"), z.literal("stale")])
-        .catch("manual"),
-      localizations: z.record(localization),
+        .catch("manual")
+        .optional(),
+      localizations: z.record(localization).optional(),
     })
   ),
 });
 
 export type StringCatalog = z.infer<typeof stringCatalog>;
+
+export const xliffTranslationSchema = z.object({
+  filename: z.string(),
+  source: z.string(),
+  target: z.string(),
+  note: z.string(),
+  sourceLanguage: z.string(),
+  targetLanguage: z.string(),
+});
+
+export type XliffTranslation = z.infer<typeof xliffTranslationSchema>;

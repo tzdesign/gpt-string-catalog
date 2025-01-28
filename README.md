@@ -1,6 +1,10 @@
 # gpt-string-catalog
 
-`gpt-string-catalog` is a command-line tool that uses OpenAI's GPT model to translate iOS string catalogs into multiple languages.
+`gpt-string-catalog` is a command-line tool that uses OpenAI's GPT model to translate iOS string catalogs and xliff into multiple languages.
+
+My motivation as an indie developer was to be able to offer my app in as many languages as possible with the least possible effort.
+That's why this tool can translate string catalogs and Xliff files.
+
 
 ## Installation
 
@@ -13,23 +17,24 @@ npm install gpt-string-catalog
 ## Usage
 
 ```sh
-gpt-string-catalog [options] <file>
+gpt-string-catalog [options] [command]
 ```
-
-### Arguments
-
-- `<file>`: The file or directory to translate.
 
 ### Options
 
 - `-V, --version`: Output the version number.
-- `-l, --languages <languages>`: The language codes. Please check the language codes in XCode.
-- `-a, --api-key <key>`: OpenAI API key. Can also be set via the `OPENAI_API_KEY` environment variable.
+- `-h, --help`: Display help for command.
+
+### Commands
+
+- `translate [options] <file>`: Translate a xcstrings file. The file will be translated to the languages provided.
+- `translate-xliff [options] <file>`: Translate a xliff file(s). All infos are in the files. You can provide a directory or a file.
+- `help [command]`: Display help for command.
 
 ### Example
 
 ```sh
-gpt-string-catalog ~/path/to/Localizable.xcstrings -l es,fr,de -a your_openai_api_key
+gpt-string-catalog translate ~/path/to/Localizable.xcstrings -l es,fr,de -a your_openai_api_key
 ```
 
 ## Environment Variables
