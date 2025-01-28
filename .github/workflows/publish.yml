@@ -19,5 +19,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Install dependencies and build 🔧
         run: pnpm install && pnpm build
+      - name: Set version
+        run: pnpm version --no-git-tag-version $(echo "${{ github.event.release.tag_name }}" | sed "s/v//")
       - name: Publish package on NPM 📦
-        run: pnpm publish --new-version $(echo "${{ github.event.release.tag_name }}" | sed "s/v//") --no-commit-hooks --no-git-tag-version
+        run: pnpm publish
