@@ -20,6 +20,6 @@ jobs:
       - name: Install dependencies and build 🔧
         run: pnpm install && pnpm build
       - name: Set version
-        run: pnpm version $(echo "${{ github.event.release.tag_name }}" | sed "s/v//") --no-git-tag-version --force
+        run: pnpm version $(echo "${{ github.event.release.tag_name }}" | sed "s/v//") --no-git-tag-version
       - name: Publish package on NPM 📦
         run: pnpm publish --no-git-checks
