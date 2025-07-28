@@ -101,7 +101,7 @@ export default async function translateStringCatalog(
           if (
             existingTranslation &&
             "stringUnit" in existingTranslation &&
-            existingTranslation.stringUnit
+            existingTranslation.stringUnit?.value
           ) {
             continue;
           }
@@ -148,8 +148,7 @@ export default async function translateStringCatalog(
               existingTranslation.variations &&
               "plural" in existingTranslation.variations &&
               existingTranslation.variations.plural &&
-              existingTranslation.variations.plural[pluralKey] &&
-              existingTranslation.variations.plural[pluralKey].stringUnit?.value
+              existingTranslation.variations.plural[pluralKey]?.stringUnit?.value
             ) {
               continue;
             }
@@ -169,10 +168,10 @@ export default async function translateStringCatalog(
                 [lang]: {
                   variations: {
                     plural: {
-                      ...(catalog.strings[key].localizations &&
-                      "variations" in catalog.strings[key].localizations[lang]
-                        ? catalog.strings[key].localizations?.[lang].variations
-                            ?.plural
+                      ...(catalog.strings[key].localizations?.[lang] &&
+                      "variations" in catalog.strings[key].localizations[lang] &&
+                      catalog.strings[key].localizations[lang].variations?.plural
+                        ? catalog.strings[key].localizations[lang].variations.plural
                         : {}),
                       [pluralKey]: {
                         stringUnit: {
@@ -194,7 +193,7 @@ export default async function translateStringCatalog(
           if (
             existingTranslation &&
             "stringUnit" in existingTranslation &&
-            existingTranslation.stringUnit
+            existingTranslation.stringUnit?.value
           )
             continue;
           try {
