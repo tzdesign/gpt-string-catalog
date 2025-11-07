@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import os from "os";
 import fs from "fs";
 import { stringCatalog } from "./types";
+import "colors";
 
 export default async function translateStringCatalog(
   file: string,
@@ -29,6 +30,16 @@ export default async function translateStringCatalog(
     return;
   }
 
+  const translationResult: Record<
+    string,
+    { translation: string; language: string }[]
+  > = {};
+
+  const addToResult = (input: string, lang: string, translation: string) => {
+    translationResult[input] = translationResult[input] || [];
+    translationResult[input].push({ translation, language: lang });
+  };
+
   async function translate({
     text,
     sourceLanguage,
@@ -42,7 +53,8 @@ export default async function translateStringCatalog(
     openAi: OpenAI;
     comment?: string;
   }): Promise<string> {
-    log.step(`Translating ${text} ${comment ? `(${comment})` : ""}`);
+    spin.start(`Translating ${text} ${comment ? `(${comment})` : ""}`);
+
     const result = await openAi.chat.completions.create({
       model: options.model,
       messages: [
@@ -72,18 +84,15 @@ export default async function translateStringCatalog(
     });
 
     const message = result.choices?.[0]?.message.content;
-
-    log.success(message ?? "No translation found");
+    spin.stop(message ?? "No translation found");
 
     if (!message) {
       throw new Error("No translation found");
     }
-
     return message;
   }
 
   intro("Let's go 🤞.");
-  let translationCount = 0;
 
   const fileContent = fs.readFileSync(file.replace("~", os.homedir()), "utf8");
   try {
@@ -113,6 +122,12 @@ export default async function translateStringCatalog(
               openAi: openai,
               comment,
             });
+
+            addToResult(
+              source.stringUnit.value,
+              catalog.sourceLanguage,
+              newText
+            );
             catalog.strings[key].localizations = {
               ...catalog.strings[key].localizations,
               [lang]: {
@@ -122,7 +137,6 @@ export default async function translateStringCatalog(
                 },
               },
             };
-            translationCount++;
           } catch (e) {
             console.error(e);
           }
@@ -148,7 +162,8 @@ export default async function translateStringCatalog(
               existingTranslation.variations &&
               "plural" in existingTranslation.variations &&
               existingTranslation.variations.plural &&
-              existingTranslation.variations.plural[pluralKey]?.stringUnit?.value
+              existingTranslation.variations.plural[pluralKey]?.stringUnit
+                ?.value
             ) {
               continue;
             }
@@ -161,7 +176,12 @@ export default async function translateStringCatalog(
                 openAi: openai,
                 comment,
               });
-              translationCount++;
+
+              addToResult(
+                source.variations.plural[pluralKey].stringUnit.value,
+                catalog.sourceLanguage,
+                newText
+              );
 
               catalog.strings[key].localizations = {
                 ...catalog.strings[key].localizations,
@@ -169,9 +189,12 @@ export default async function translateStringCatalog(
                   variations: {
                     plural: {
                       ...(catalog.strings[key].localizations?.[lang] &&
-                      "variations" in catalog.strings[key].localizations[lang] &&
-                      catalog.strings[key].localizations[lang].variations?.plural
-                        ? catalog.strings[key].localizations[lang].variations.plural
+                      "variations" in
+                        catalog.strings[key].localizations[lang] &&
+                      catalog.strings[key].localizations[lang].variations
+                        ?.plural
+                        ? catalog.strings[key].localizations[lang].variations
+                            .plural
                         : {}),
                       [pluralKey]: {
                         stringUnit: {
@@ -204,7 +227,6 @@ export default async function translateStringCatalog(
               openAi: openai,
               comment,
             });
-            translationCount++;
 
             catalog.strings[key].localizations = {
               ...catalog.strings[key].localizations,
@@ -221,6 +243,12 @@ export default async function translateStringCatalog(
         }
       }
     }
+
+    const translationCount = Object.values(translationResult).reduce(
+      (acc, curr) => acc + curr.length,
+      0
+    );
+
     if (translationCount > 0) {
       fs.writeFileSync(
         file.replace("~", os.homedir()),
@@ -228,6 +256,16 @@ export default async function translateStringCatalog(
       );
       log.success(`Updated ${file}`);
     }
+
+    for (const [sourceText, translations] of Object.entries(
+      translationResult
+    )) {
+      log.info(`Source: ${sourceText}`);
+      for (const { translation, language } of translations) {
+        log.info(`  [${language.green}]: ${translation}`);
+      }
+    }
+
     outro(`Translated ${translationCount} strings`);
   } catch (e) {
     console.dir(e, { depth: null });
