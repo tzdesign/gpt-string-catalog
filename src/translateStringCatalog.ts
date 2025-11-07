@@ -53,7 +53,11 @@ export default async function translateStringCatalog(
     openAi: OpenAI;
     comment?: string;
   }): Promise<string> {
-    spin.start(`Translating ${text} ${comment ? `(${comment})` : ""}`);
+    spin.start(
+      `Translating ${text} to ${targetLanguage} ${
+        comment ? `(${comment})` : ""
+      }`.replace(/\s*\n\s*/g, " ")
+    );
 
     const result = await openAi.chat.completions.create({
       model: options.model,
@@ -84,7 +88,12 @@ export default async function translateStringCatalog(
     });
 
     const message = result.choices?.[0]?.message.content;
-    spin.stop(message ?? "No translation found");
+    spin.stop(
+      (message
+        ? `✓ ${message}`
+        : "No translation found"
+      ).replace(/\s*\n\s*/g, " ")
+    );
 
     if (!message) {
       throw new Error("No translation found");
@@ -123,11 +132,7 @@ export default async function translateStringCatalog(
               comment,
             });
 
-            addToResult(
-              source.stringUnit.value,
-              catalog.sourceLanguage,
-              newText
-            );
+            addToResult(source.stringUnit.value, lang, newText);
             catalog.strings[key].localizations = {
               ...catalog.strings[key].localizations,
               [lang]: {
@@ -179,7 +184,7 @@ export default async function translateStringCatalog(
 
               addToResult(
                 source.variations.plural[pluralKey].stringUnit.value,
-                catalog.sourceLanguage,
+                lang,
                 newText
               );
 
@@ -228,6 +233,8 @@ export default async function translateStringCatalog(
               comment,
             });
 
+            addToResult(key, lang, newText);
+
             catalog.strings[key].localizations = {
               ...catalog.strings[key].localizations,
               [lang]: {
@@ -250,19 +257,22 @@ export default async function translateStringCatalog(
     );
 
     if (translationCount > 0) {
+      log.step(`Writing translations to ${file}`);
       fs.writeFileSync(
         file.replace("~", os.homedir()),
         JSON.stringify(catalog, null, 2)
       );
       log.success(`Updated ${file}`);
-    }
 
-    for (const [sourceText, translations] of Object.entries(
-      translationResult
-    )) {
-      log.info(`Source: ${sourceText}`);
-      for (const { translation, language } of translations) {
-        log.info(`  [${language.green}]: ${translation}`);
+      log.step("Summary".yellow);
+
+      for (const [sourceText, translations] of Object.entries(
+        translationResult
+      )) {
+        log.success(`Source: ${sourceText}`);
+        for (const { translation, language } of translations) {
+          log.info(`    ${language.green}: ${translation}`);
+        }
       }
     }
 
