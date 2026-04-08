@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Translate XCode StringCatalog files with GPT",
   "main": "index.js",
+  "repository": {
+    "url": "https://github.com/tzdesign/gpt-string-catalog"
+  },
   "scripts": {
     "dev": "ts-node src/index.ts",
     "build": "tsc"
@@ -24,6 +27,6 @@
     "zod": "^3.24.1"
   },
   "bin": {
-    "gpt-sc": "./dist/index.js"
+    "gpt-sc": "dist/index.js"
   }
 }
