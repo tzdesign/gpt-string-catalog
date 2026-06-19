@@ -1,9 +1,12 @@
 import { z } from "zod";
+// zod v4 entrypoint, used only for schemas that need `z.toJSONSchema()`.
+import { z as z4 } from "zod/v4";
 
 export const stringUnit = z.object({
   state: z.union([
     z.literal("translated"),
     z.literal("new"),
+    z.literal("needs_review"),
     z.literal("needs-translation"),
   ]),
   value: z.string(),
@@ -15,7 +18,9 @@ export const pluralVariation = z.record(
   z.literal("plural"),
   z.record(
     z.union([
+      z.literal("zero"),
       z.literal("one"),
+      z.literal("two"),
       z.literal("few"),
       z.literal("many"),
       z.literal("other"),
@@ -48,13 +53,15 @@ export const stringCatalog = z.object({
 
 export type StringCatalog = z.infer<typeof stringCatalog>;
 
-export const xliffTranslationSchema = z.object({
-  filename: z.string(),
-  source: z.string(),
-  target: z.string(),
-  note: z.string(),
-  sourceLanguage: z.string(),
-  targetLanguage: z.string(),
+// Built with zod v4 so we can derive a JSON Schema via `z.toJSONSchema()`
+// for OpenAI structured outputs.
+export const xliffTranslationSchema = z4.object({
+  filename: z4.string(),
+  source: z4.string(),
+  target: z4.string(),
+  note: z4.string(),
+  sourceLanguage: z4.string(),
+  targetLanguage: z4.string(),
 });
 
-export type XliffTranslation = z.infer<typeof xliffTranslationSchema>;
+export type XliffTranslation = z4.infer<typeof xliffTranslationSchema>;
