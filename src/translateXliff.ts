@@ -1,6 +1,6 @@
 import { intro, log, outro, spinner } from "@clack/prompts";
 import OpenAI from "openai";
-import { zodResponseFormat } from "openai/helpers/zod";
+import { z } from "zod/v4";
 import findXliff from "./utils/findXliff";
 // @ts-ignore
 import jsToXliff12 from "xliff/jsToXliff12";
@@ -53,10 +53,14 @@ export default async function translateXliff(
           spin.start(`Translating ${source}`);
           const result = await openai.chat.completions.create({
             model: "gpt-4o",
-            response_format: zodResponseFormat(
-              xliffTranslationSchema,
-              "translation"
-            ),
+            response_format: {
+              type: "json_schema",
+              json_schema: {
+                name: "translation",
+                strict: true,
+                schema: z.toJSONSchema(xliffTranslationSchema),
+              },
+            },
             messages: [
               {
                 role: "system",

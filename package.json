@@ -18,17 +18,17 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^25.5.2",
-    "typescript": "^6.0.2"
+    "@types/node": "^25.9.4",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",
     "colors": "^1.4.0",
-    "commander": "^13.0.0",
-    "openai": "^4.79.1",
+    "commander": "^13.1.0",
+    "openai": "^6.44.0",
     "os": "^0.1.2",
-    "xliff": "^6.2.1",
-    "zod": "^3.24.1"
+    "xliff": "^6.3.0",
+    "zod": "^3.25.76"
   },
   "bin": {
     "gpt-sc": "dist/index.js"
