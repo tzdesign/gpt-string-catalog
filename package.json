@@ -1,6 +1,6 @@
 {
   "name": "gpt-string-catalog",
-  "version": "0.0.1",
+  "version": "2.0.0-beta.0",
   "description": "Translate XCode StringCatalog files with GPT",
   "main": "index.js",
   "repository": {
