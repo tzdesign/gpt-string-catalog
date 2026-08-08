@@ -29,6 +29,8 @@ export const pluralVariation = z.record(
   )
 );
 
+export type PluralKey = "zero" | "one" | "two" | "few" | "many" | "other";
+
 export const localization = z.union([
   z.record(z.literal("stringUnit"), stringUnit),
   z.record(z.literal("variations"), pluralVariation),
