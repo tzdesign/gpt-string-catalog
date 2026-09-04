@@ -1,0 +1,86 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "Hello %@": {
+      "comment": "Greeting shown on the home screen",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": { "state": "translated", "value": "Hello %@" }
+        },
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Hallo %@" }
+        }
+      }
+    },
+    "Settings": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": { "state": "translated", "value": "Settings" }
+        }
+      }
+    },
+    "Key only, no localizations": {},
+    "Fully translated": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Fully translated" } },
+        "de": { "stringUnit": { "state": "translated", "value": "Fertig" } },
+        "pl": { "stringUnit": { "state": "translated", "value": "Gotowe" } },
+        "ar": { "stringUnit": { "state": "translated", "value": "تم" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "完了" } }
+      }
+    },
+    "Needs review upstream": {
+      "localizations": {
+        "en": { "stringUnit": { "state": "needs_review", "value": "Draft copy" } }
+      }
+    },
+    "apple_count": {
+      "comment": "Number of apples in the basket",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": { "stringUnit": { "state": "translated", "value": "%lld apple" } },
+              "other": { "stringUnit": { "state": "translated", "value": "%lld apples" } }
+            }
+          }
+        }
+      }
+    },
+    "message_count": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": { "stringUnit": { "state": "translated", "value": "%lld new message" } },
+              "other": { "stringUnit": { "state": "translated", "value": "%lld new messages" } }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": { "stringUnit": { "state": "translated", "value": "%lld neue Nachricht" } }
+            }
+          }
+        }
+      }
+    },
+    "day_count": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "zero": { "stringUnit": { "state": "translated", "value": "No days" } },
+              "one": { "stringUnit": { "state": "translated", "value": "%lld day" } },
+              "other": { "stringUnit": { "state": "translated", "value": "%lld days" } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

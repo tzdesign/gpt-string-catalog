@@ -28,6 +28,11 @@ program
     "-a, --api-key <key>",
     "OpenAI API key. Can also be set via OPENAI_API_KEY env variable"
   )
+  .option(
+    "-c, --concurrency <number>",
+    "How many strings are translated in parallel",
+    "10"
+  )
   .action(translateStringCatalog);
 
 program
